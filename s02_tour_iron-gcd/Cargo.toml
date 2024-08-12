@@ -1,0 +1,10 @@
+[package]
+name = "s02_tour_iron-gcd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iron = "0.6"
+mime = "0.3"
+router = "0.6"
+urlencoded = "0.6"
