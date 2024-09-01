@@ -26,7 +26,7 @@ pub fn run(config: Config) -> MyResult<()> {
     for chars in &char_ranges {
         chars.clone().into_iter()
             .filter(|ch| !ch.is_control())
-            .for_each(|ch| println!("{}", ch));
+            .for_each(|ch| println!("{:#08x}: [{}]", ch as u64, ch));
     }
 
     Ok(())
