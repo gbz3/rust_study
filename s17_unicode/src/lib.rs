@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Formatter};
+use std::ops::RangeInclusive;
 use std::str::FromStr;
 use clap::Parser;
 
@@ -28,6 +29,10 @@ pub struct Config {
         help = "ASCII")]
     ascii: bool,
 
+    #[arg(short = 'u', long = "unicode",
+        help = "print specified unicode range")]
+    unicode_range: Option<String>,
+
     #[arg(short = 'c', long = "char",
         help = "print specified character range")]
     char_range: Option<String>,
@@ -41,6 +46,10 @@ pub fn run(config: Config) -> MyResult<()> {
     println!("{:#?}", config);
 
     let char_ranges = match config {
+        Config { unicode_range: Some(code), .. } => match parse_unicode_range(&code, '-') {
+            Some(v) => v,
+            _ => return Err(Box::new(MyError::InvalidCharRange))
+        },
         Config {char_range: Some(code), ..} => match parse_pair::<String>(&code, '-') {
             Some((l, r)) => vec![char::from_str(&l)?..=char::from_str(&r)?],
             _ => return Err(Box::new(MyError::InvalidCharRange))
@@ -67,5 +76,20 @@ fn parse_pair<T: FromStr>(s: &str, separator: char) -> Option<(T, T)> {
                 _ => None,
             }
         },
+    }
+}
+
+fn parse_unicode_range(s: &str, separator: char) -> Option<Vec<RangeInclusive<char>>> {
+    match s.find(separator) {
+        None => None,
+        Some(index) => {
+            match (
+                u32::from_str_radix(&s[..index], 16).ok().and_then(|n| char::from_u32(n)),
+                u32::from_str_radix(&s[index + 1..], 16).ok().and_then(|n| char::from_u32(n))
+            ) {
+                (Some(l), Some(r)) => Some(vec![l..=r]),
+                _ => None,
+            }
+        }
     }
 }
