@@ -1,0 +1,9 @@
+[package]
+name = "s19_parallel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = "0.21"
+num = "0.4.3"
+crossbeam = "0.8.4"
